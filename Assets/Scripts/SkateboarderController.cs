@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class SkateboarderController : MonoBehaviour
 {
@@ -19,7 +20,10 @@ public class SkateboarderController : MonoBehaviour
     int checkPointIndex;
     public Transform[] checkPoint;
 
-   
+    public TextMeshProUGUI timer;
+    public float remainingTime;
+
+
     void Start()
     {
        
@@ -86,6 +90,24 @@ public class SkateboarderController : MonoBehaviour
 
         isGrounded = CheckIfGrounded();
 
+        if (UiManager.instance.gameStart)
+        {
+            if (remainingTime > 0)
+            {
+
+                remainingTime -= Time.deltaTime;
+            }
+            else if (remainingTime < 0)
+            {
+                remainingTime = 0;
+
+                UiManager.instance.bg.SetActive(true);
+                UiManager.instance.gameOverPanel.SetActive(true);
+            }
+            int minutes = Mathf.FloorToInt(remainingTime / 60);
+            int seconds = Mathf.FloorToInt(remainingTime % 60);
+            timer.text = string.Format("{0:0}:{1:00}", minutes, seconds);
+        }
 
         if (gameObject.transform.position.y < -5)
         {
@@ -135,9 +157,14 @@ public class SkateboarderController : MonoBehaviour
 
     void HandleMovement()
     {
-
+#if UNITY_EDITOR
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+#else
         float horizontal = fixedjoystick.Horizontal;  
         float vertical = fixedjoystick.Vertical;
+#endif
+
 
         Vector3 forwardMovement = transform.forward * vertical * speed * Time.deltaTime;
 

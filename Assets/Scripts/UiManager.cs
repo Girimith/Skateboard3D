@@ -9,10 +9,13 @@ public class UiManager : MonoBehaviour
     [SerializeField] private RawImage _img;
     [SerializeField] private float _x, _y;
 
+    [HideInInspector] public bool gameStart = false;
+
     public GameObject bg;
     public GameObject startPanel;
     public GameObject pausePanel;
     public GameObject completePanel;
+    public GameObject gameOverPanel;
 
 
     private void Awake()
@@ -24,32 +27,34 @@ public class UiManager : MonoBehaviour
     {
         bg.SetActive(false);
         startPanel.SetActive(false);
+        gameStart = true;
     }
 
     public void OnClicPause()
     {
-        //Time.timeScale = 0;
         bg.SetActive(true);
         pausePanel.SetActive(true);
     }
 
     public void OnClickResume()
     {
-        //Time.timeScale = 1;
         bg.SetActive(false);
         pausePanel.SetActive(false);
     }
 
     public void Restart()
     {
-        //Time.timeScale = 1;
 
         SceneManager.LoadScene(0);
     }
 
     public void OnApplicationQuit()
     {
-        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit ();
+#endif
     }
 
     // Update is called once per frame
